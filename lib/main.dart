@@ -135,6 +135,7 @@ class MainPageState extends State<MainPage> {
                     title: const Text('Logout'),
                     onTap: () async {
                       await _logout();
+                      showSnackBar('Logged out successfully');
                       Navigator.pop(context);
                     },
                   ),
@@ -143,6 +144,13 @@ class MainPageState extends State<MainPage> {
             )
           : null,
     );
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    ));
   }
 
   void navigateToLoginPage() {

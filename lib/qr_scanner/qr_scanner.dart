@@ -4,7 +4,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scan/scan.dart';
 import 'user_details_page.dart';
-import '../shared/user.dart';
+import '../shared/employee.dart';
 
 class QRScanner extends StatefulWidget {
   final Function(QRViewController) onQRViewCreated;
@@ -70,16 +70,16 @@ class _QRScannerState extends State<QRScanner> {
 
   Future<void> _displayUserDetails(String? qrData) async {
     if (qrData == null) return;
-    User user = await User.fromQrData(qrData);
+    Employee employee = await Employee.fromQrData(qrData);
     await controller?.pauseCamera();
-    _navigateToUserDetails(user);
+    _navigateToUserDetails(employee);
   }
 
-  void _navigateToUserDetails(User user) {
+  void _navigateToUserDetails(Employee employee) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UserDetailsPage(user: user),
+        builder: (context) => UserDetailsPage(employee: employee),
       ),
     ).then((_) {
       setState(() {

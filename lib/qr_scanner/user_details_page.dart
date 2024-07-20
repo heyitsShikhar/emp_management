@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../shared/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../shared/employee.dart';
 
 class UserDetailsPage extends StatefulWidget {
-  final User user;
-  const UserDetailsPage({super.key, required this.user});
+  final Employee employee;
+  const UserDetailsPage({super.key, required this.employee});
 
   @override
   UserDetailsPageState createState() => UserDetailsPageState();
@@ -12,11 +13,13 @@ class UserDetailsPage extends StatefulWidget {
 
 class UserDetailsPageState extends State<UserDetailsPage> {
   late Future<Map<String, dynamic>?> _attendanceFuture;
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _attendanceFuture = _fetchAttendance();
+    _currentUser = FirebaseAuth.instance.currentUser;
   }
 
   Future<Map<String, dynamic>?> _fetchAttendance() async {
@@ -27,7 +30,7 @@ class UserDetailsPageState extends State<UserDetailsPage> {
 
     final querySnapshot = await FirebaseFirestore.instance
         .collection('attendance')
-        .where('employeeId', isEqualTo: widget.user.empId)
+        .where('employeeId', isEqualTo: widget.employee.empId)
         .where('date', isGreaterThanOrEqualTo: startOfDay.toIso8601String())
         .where('date', isLessThanOrEqualTo: endOfDay.toIso8601String())
         .orderBy('date', descending: true)
@@ -47,7 +50,7 @@ class UserDetailsPageState extends State<UserDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.user.name),
+        title: Text(widget.employee.name),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -67,24 +70,25 @@ class UserDetailsPageState extends State<UserDetailsPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Employee ID: ${widget.user.empId}',
+                Text('Employee ID: ${widget.employee.empId}',
                     style: const TextStyle(fontSize: 18)),
-                Text('Name: ${widget.user.name}',
+                Text('Name: ${widget.employee.name}',
                     style: const TextStyle(fontSize: 18)),
-                Text('Car Number: ${widget.user.carNumber}',
+                Text('Car Number: ${widget.employee.carNumber}',
                     style: const TextStyle(fontSize: 18)),
-                Text('Phone Number: ${widget.user.phoneNumber}',
+                Text('Phone Number: ${widget.employee.phoneNumber}',
                     style: const TextStyle(fontSize: 18)),
                 const SizedBox(height: 20),
-                attendance == null || attendance['checkOut'] != null
-                    ? ElevatedButton(
-                        onPressed: () => _checkIn(context),
-                        child: const Text('Check In'),
-                      )
-                    : ElevatedButton(
-                        onPressed: () => _checkOut(context, attendance),
-                        child: const Text('Check Out'),
-                      ),
+                if (_currentUser != null)
+                  attendance == null || attendance['checkOut'] != null
+                      ? ElevatedButton(
+                          onPressed: () => _checkIn(context),
+                          child: const Text('Check In'),
+                        )
+                      : ElevatedButton(
+                          onPressed: () => _checkOut(context, attendance),
+                          child: const Text('Check Out'),
+                        ),
               ],
             );
           },
@@ -95,8 +99,8 @@ class UserDetailsPageState extends State<UserDetailsPage> {
 
   void _checkIn(BuildContext context) async {
     final attendance = {
-      'employeeId': widget.user.empId,
-      'name': widget.user.name,
+      'employeeId': widget.employee.empId,
+      'name': widget.employee.name,
       'date': DateTime.now().toIso8601String(),
       'checkIn': DateTime.now().toIso8601String(),
       'checkOut': null,

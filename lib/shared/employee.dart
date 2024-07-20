@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-class User {
+class Employee {
   final String empId;
   final String name;
   final String carNumber;
   final String phoneNumber;
   final DateTime createdAt;
 
-  User({
+  Employee({
     required this.empId,
     required this.name,
     required this.carNumber,
@@ -25,8 +25,8 @@ class User {
     };
   }
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory Employee.fromJson(Map<String, dynamic> json) {
+    return Employee(
       empId: json['empId'],
       name: json['name'],
       carNumber: json['carNumber'],
@@ -35,8 +35,8 @@ class User {
     );
   }
 
-  static Future<User> fromQrData(String qrData) async {
+  static Future<Employee> fromQrData(String qrData) async {
     final Map<String, dynamic> json = jsonDecode(qrData);
-    return User.fromJson(json);
+    return Employee.fromJson(json);
   }
 }

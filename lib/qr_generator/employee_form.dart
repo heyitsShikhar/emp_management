@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
-import '../shared/user.dart';
+import '../shared/employee.dart';
 
 class EmployeeForm extends StatefulWidget {
   const EmployeeForm({super.key});
@@ -126,7 +126,7 @@ class EmployeeFormState extends State<EmployeeForm> {
 
   void _generateQrCode() async {
     if (_formKey.currentState!.validate()) {
-      User user = User(
+      Employee employee = Employee(
         empId: _empIdController.text,
         name: _nameController.text,
         carNumber: _carNumberController.text,
@@ -134,21 +134,21 @@ class EmployeeFormState extends State<EmployeeForm> {
         createdAt: DateTime.now(),
       );
 
-      await checkDuplicateEmpId(user);
+      await checkDuplicateEmpId(employee);
     }
   }
 
-  Future<void> checkDuplicateEmpId(User user) async {
+  Future<void> checkDuplicateEmpId(Employee employee) async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('employees')
-        .where('empId', isEqualTo: user.empId)
+        .where('empId', isEqualTo: employee.empId)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
       showDuplicateAlert();
     } else {
-      saveToFirestore(user);
-      displayQrCode(user);
+      saveToFirestore(employee);
+      displayQrCode(employee);
       clearAllFields();
       dismissKeyboard();
     }
@@ -194,13 +194,15 @@ class EmployeeFormState extends State<EmployeeForm> {
     showSnackBar('QR Code saved to ${file.path}');
   }
 
-  void saveToFirestore(User user) async {
-    await FirebaseFirestore.instance.collection('employees').add(user.toJson());
+  void saveToFirestore(Employee employee) async {
+    await FirebaseFirestore.instance
+        .collection('employees')
+        .add(employee.toJson());
   }
 
-  void displayQrCode(User user) {
+  void displayQrCode(Employee employee) {
     setState(() {
-      _qrData = jsonEncode(user.toJson());
+      _qrData = jsonEncode(employee.toJson());
     });
   }
 

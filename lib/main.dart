@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'qr_generator/employee_form.dart';
 import 'qr_scanner/qr_scanner.dart';
@@ -36,6 +37,17 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   QRViewController? _qrViewController;
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      setState(() {
+        _user = user;
+      });
+    });
+  }
 
   void _setQRViewController(QRViewController controller) {
     setState(() {
@@ -56,60 +68,64 @@ class MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Employee QR Scanner'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              _pauseQRScanner();
-              navigateToLoginPage();
-            },
-          ),
-        ],
+        actions: _user == null
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.person),
+                  onPressed: () {
+                    _pauseQRScanner();
+                    navigateToLoginPage();
+                  },
+                ),
+              ]
+            : null,
       ),
       body: QRScanner(onQRViewCreated: _setQRViewController),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue.shade400,
+      drawer: _user != null
+          ? Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade400,
+                    ),
+                    child: const Text(
+                      'Power Grid',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.people),
+                    title: const Text('All employees'),
+                    onTap: () {
+                      _pauseQRScanner();
+                      navigateToViewAllEmployees();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Attendance'),
+                    onTap: () {
+                      _pauseQRScanner();
+                      navigateToAttendance();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.add),
+                    title: const Text('New Employee'),
+                    onTap: () {
+                      _pauseQRScanner();
+                      navigateToEmployeeForm();
+                    },
+                  ),
+                ],
               ),
-              child: const Text(
-                'Power Grid',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text('All employees'),
-              onTap: () {
-                _pauseQRScanner();
-                navigateToViewAllEmployees();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.list),
-              title: const Text('Attendance'),
-              onTap: () {
-                _pauseQRScanner();
-                navigateToAttendance();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: const Text('New Employee'),
-              onTap: () {
-                _pauseQRScanner();
-                navigateToEmployeeForm();
-              },
-            ),
-          ],
-        ),
-      ),
+            )
+          : null,
     );
   }
 
@@ -117,7 +133,12 @@ class MainPageState extends State<MainPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
-    ).then((_) => _resumeQRScanner());
+    ).then((_) {
+      setState(() {
+        _user = FirebaseAuth.instance.currentUser;
+      });
+      _resumeQRScanner();
+    });
   }
 
   void navigateToViewAllEmployees() {

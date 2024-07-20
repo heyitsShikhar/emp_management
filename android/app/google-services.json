@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1093002467794",
+    "project_id": "test-a9764",
+    "storage_bucket": "test-a9764.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093002467794:android:272b682ba64f5a2798100b",
+        "android_client_info": {
+          "package_name": "com.example.gov_qr_emp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1BL9gfTGfgfZImFfUmGvP-QeybpheMNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

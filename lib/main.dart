@@ -49,6 +49,84 @@ class MainPageState extends State<MainPage> {
     });
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Employee QR Scanner'),
+        actions: _user == null
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.person),
+                  onPressed: () {
+                    _pauseQRScanner();
+                    navigateToLoginPage();
+                  },
+                ),
+              ]
+            : null,
+      ),
+      body: QRScanner(onQRViewCreated: _setQRViewController),
+      drawer: _user != null ? _buildDrawer(context) : null,
+    );
+  }
+
+  Drawer _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue.shade400,
+            ),
+            child: const Text(
+              'Power Grid',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: const Text('Attendance'),
+            onTap: () {
+              _pauseQRScanner();
+              navigateToAttendance();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.people),
+            title: const Text('All employees'),
+            onTap: () {
+              _pauseQRScanner();
+              navigateToViewAllEmployees();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.add),
+            title: const Text('New Employee'),
+            onTap: () {
+              _pauseQRScanner();
+              navigateToEmployeeForm();
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
+            onTap: () async {
+              await _logout();
+              showSnackBar('Logged out successfully');
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   void _setQRViewController(QRViewController controller) {
     setState(() {
       _qrViewController = controller;
@@ -68,82 +146,6 @@ class MainPageState extends State<MainPage> {
     setState(() {
       _user = null;
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Employee QR Scanner'),
-        actions: _user == null
-            ? [
-                IconButton(
-                  icon: const Icon(Icons.person),
-                  onPressed: () {
-                    _pauseQRScanner();
-                    navigateToLoginPage();
-                  },
-                ),
-              ]
-            : null,
-      ),
-      body: QRScanner(onQRViewCreated: _setQRViewController),
-      drawer: _user != null
-          ? Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade400,
-                    ),
-                    child: const Text(
-                      'Power Grid',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.people),
-                    title: const Text('All employees'),
-                    onTap: () {
-                      _pauseQRScanner();
-                      navigateToViewAllEmployees();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.list),
-                    title: const Text('Attendance'),
-                    onTap: () {
-                      _pauseQRScanner();
-                      navigateToAttendance();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.add),
-                    title: const Text('New Employee'),
-                    onTap: () {
-                      _pauseQRScanner();
-                      navigateToEmployeeForm();
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.exit_to_app),
-                    title: const Text('Logout'),
-                    onTap: () async {
-                      await _logout();
-                      showSnackBar('Logged out successfully');
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            )
-          : null,
-    );
   }
 
   void showSnackBar(String message) {

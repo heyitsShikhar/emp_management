@@ -63,6 +63,13 @@ class MainPageState extends State<MainPage> {
     _qrViewController?.resumeCamera();
   }
 
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    setState(() {
+      _user = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,6 +127,15 @@ class MainPageState extends State<MainPage> {
                     onTap: () {
                       _pauseQRScanner();
                       navigateToEmployeeForm();
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.exit_to_app),
+                    title: const Text('Logout'),
+                    onTap: () async {
+                      await _logout();
+                      Navigator.pop(context);
                     },
                   ),
                 ],

@@ -7,7 +7,9 @@ import 'user_details_page.dart';
 import '../shared/user.dart';
 
 class QRScanner extends StatefulWidget {
-  const QRScanner({super.key});
+  final Function(QRViewController) onQRViewCreated;
+
+  const QRScanner({super.key, required this.onQRViewCreated});
 
   @override
   State<StatefulWidget> createState() => _QRScannerState();
@@ -42,7 +44,10 @@ class _QRScannerState extends State<QRScanner> {
         children: [
           QRView(
             key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
+            onQRViewCreated: (controller) {
+              widget.onQRViewCreated(controller);
+              _onQRViewCreated(controller);
+            },
           ),
         ],
       ),

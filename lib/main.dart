@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'qr_generator/employee_form.dart';
+import 'menu_items/employee_form.dart';
 import 'qr_scanner/qr_scanner.dart';
 import 'menu_items/view_all_employees.dart';
 import 'menu_items/view_attendance.dart';

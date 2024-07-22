@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gov_qr_emp/menu_items/manage_access/manage_access_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'menu_items/employee_form.dart';
 import 'qr_scanner/qr_scanner.dart';
@@ -97,6 +98,14 @@ class MainPageState extends State<MainPage> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.lock),
+            title: const Text('Manage user access'),
+            onTap: () {
+              _pauseQRScanner();
+              navigateToManageAccess();
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.people),
             title: const Text('All employees'),
             onTap: () {
@@ -167,17 +176,24 @@ class MainPageState extends State<MainPage> {
     });
   }
 
-  void navigateToViewAllEmployees() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ViewAllEmployeesPage()),
-    ).then((_) => _resumeQRScanner());
-  }
-
   void navigateToAttendance() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ViewAttendancePage()),
+    ).then((_) => _resumeQRScanner());
+  }
+
+  void navigateToManageAccess() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ManageAccessPage()),
+    ).then((_) => _resumeQRScanner());
+  }
+
+  void navigateToViewAllEmployees() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ViewAllEmployeesPage()),
     ).then((_) => _resumeQRScanner());
   }
 

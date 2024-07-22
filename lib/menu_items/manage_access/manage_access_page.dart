@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gov_qr_emp/utilities/constants.dart';
+import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'update_users_dialog.dart';
 import 'update_access_dialog.dart';
 import 'new_access_type_dialog.dart';
@@ -72,9 +73,7 @@ class ManageAccessPageState extends State<ManageAccessPage> {
                 _accessTypeController,
                 _selectedPermissions,
                 () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Access added successfully')),
-                  );
+                  showSnackbar(context, 'Access added successfully');
                   setState(() {
                     _accessTypeController.clear();
                     _selectedPermissions = [];

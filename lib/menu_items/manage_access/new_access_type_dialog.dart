@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gov_qr_emp/utilities/constants.dart';
+import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'multi_select_chip.dart';
 
 void showAddAccessDialog(
@@ -25,7 +26,8 @@ void showAddAccessDialog(
                   children: [
                     TextField(
                       controller: accessTypeController,
-                      decoration: const InputDecoration(labelText: 'Access Type'),
+                      decoration:
+                          const InputDecoration(labelText: 'Access Type'),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -56,9 +58,7 @@ void showAddAccessDialog(
                     onAccessAdded();
                     Navigator.pop(context);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please fill all fields')),
-                    );
+                    showSnackbar(context, 'Please fill all fields');
                   }
                 },
                 child: const Text('Add Access'),

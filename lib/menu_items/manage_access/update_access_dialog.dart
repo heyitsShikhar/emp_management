@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'multi_select_chip.dart';
 
 void showUpdateAccessDialog(
@@ -45,16 +46,10 @@ void showUpdateAccessDialog(
                         .doc(documentId)
                         .update({'permissions': selectedPermissions});
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text('Permissions updated successfully')),
-                    );
+                    showSnackbar(context, 'Permissions updated successfully');
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Please select at least one permission'),
-                      ),
-                    );
+                    showSnackbar(
+                        context, 'Please select at least one permission');
                   }
                 },
                 child: const Text('Update Permissions'),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 
-void showUpdateUsersDialog(BuildContext context, String documentId, Map<String, dynamic> data, FirebaseAuth auth, FirebaseFirestore firestore) {
+void showUpdateUsersDialog(BuildContext context, String documentId,
+    Map<String, dynamic> data, FirebaseAuth auth, FirebaseFirestore firestore) {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final emails = List<String>.from(data['emails'] ?? []);
@@ -31,27 +33,22 @@ void showUpdateUsersDialog(BuildContext context, String documentId, Map<String, 
                 final password = passwordController.text;
                 if (email.isNotEmpty && password.isNotEmpty) {
                   try {
-                    final UserCredential userCredential =
-                        await auth.createUserWithEmailAndPassword(
+                    await auth.createUserWithEmailAndPassword(
                       email: email,
                       password: password,
                     );
-
                     emails.add(email);
-                    await firestore.collection('AccessUsers').doc(documentId).update({'emails': emails});
+                    await firestore
+                        .collection('AccessUsers')
+                        .doc(documentId)
+                        .update({'emails': emails});
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('User updated successfully')),
-                    );
+                    showSnackbar(context, 'User added successfully');
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to add user: ${e.toString()}')),
-                    );
+                    showSnackbar(context, 'Failed to create user');
                   }
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please enter an email and password')),
-                  );
+                  showSnackbar(context, 'Please fill all fields');
                 }
               },
               child: const Text('Add Email'),
@@ -64,10 +61,11 @@ void showUpdateUsersDialog(BuildContext context, String documentId, Map<String, 
                   label: Text(email),
                   onDeleted: () async {
                     emails.remove(email);
-                    await firestore.collection('AccessUsers').doc(documentId).update({'emails': emails});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Email removed successfully')),
-                    );
+                    await firestore
+                        .collection('AccessUsers')
+                        .doc(documentId)
+                        .update({'emails': emails});
+                    showSnackbar(context, 'User removed successfully');
                   },
                 );
               }).toList(),

@@ -29,24 +29,37 @@ void showUpdateUsersDialog(BuildContext context, String documentId,
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () async {
+              onPressed: () {
                 final email = emailController.text;
                 final password = passwordController.text;
                 if (email.isNotEmpty && password.isNotEmpty) {
-                  try {
-                    await auth.createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                    emails.add(email);
-                    await firestore
-                        .collection('AccessUsers')
-                        .doc(documentId)
-                        .update({'emails': emails});
-                    Navigator.pop(context);
-                    showSnackbar(context, 'User added successfully');
-                  } catch (e) {
-                    showMessageAlert(context, 'Failed to add user');
+                  final currentUser = auth.currentUser;
+                  final currentEmail = currentUser?.email;
+                  if (currentEmail != null) {
+                    showAdminPasswordDialog(context, (adminPassword) async {
+                      try {
+                        await auth.createUserWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
+                        emails.add(email);
+                        await firestore
+                            .collection('AccessUsers')
+                            .doc(documentId)
+                            .update({'emails': emails});
+                        await auth.signInWithEmailAndPassword(
+                          email: currentEmail,
+                          password: adminPassword,
+                        );
+                        Navigator.pop(context);
+                        showSnackbar(context, 'User added successfully');
+                      } catch (e) {
+                        showMessageAlert(context, 'Failed to add user');
+                      }
+                    });
+                  } else {
+                    showMessageAlert(
+                        context, 'Current user is not authenticated');
                   }
                 } else {
                   showMessageAlert(context, 'Please enter email and password');
@@ -74,6 +87,45 @@ void showUpdateUsersDialog(BuildContext context, String documentId,
             ),
           ],
         ),
+      );
+    },
+  );
+}
+
+void showAdminPasswordDialog(
+    BuildContext context, Function(String) onPasswordEntered) {
+  final TextEditingController adminPasswordController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Admin Authentication'),
+        content: TextField(
+          controller: adminPasswordController,
+          decoration: const InputDecoration(labelText: 'Admin Password'),
+          obscureText: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final adminPassword = adminPasswordController.text;
+              if (adminPassword.isNotEmpty) {
+                Navigator.pop(context);
+                onPasswordEntered(adminPassword);
+              } else {
+                showMessageAlert(context, 'Please enter the admin password');
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ],
       );
     },
   );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gov_qr_emp/utilities/constants.dart';
-import 'package:gov_qr_emp/utilities/show_snackbar.dart';
+import 'package:gov_qr_emp/utilities/show_message_alert.dart';
 import 'multi_select_chip.dart';
 
 void showAddAccessDialog(
@@ -58,7 +58,7 @@ void showAddAccessDialog(
                     onAccessAdded();
                     Navigator.pop(context);
                   } else {
-                    showSnackbar(context, 'Please fill all fields');
+                    showMessageAlert(context, 'Please fill all fields');
                   }
                 },
                 child: const Text('Add Access'),

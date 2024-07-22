@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gov_qr_emp/utilities/show_message_alert.dart';
 import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'multi_select_chip.dart';
 
@@ -48,8 +49,7 @@ void showUpdateAccessDialog(
                     Navigator.pop(context);
                     showSnackbar(context, 'Permissions updated successfully');
                   } else {
-                    showSnackbar(
-                        context, 'Please select at least one permission');
+                    showMessageAlert(context, 'Please select at least one permission');
                   }
                 },
                 child: const Text('Update Permissions'),

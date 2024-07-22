@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gov_qr_emp/menu_items/manage_access/manage_access_page.dart';
+import 'package:gov_qr_emp/menu_items/view_all_employees.dart';
+import 'package:gov_qr_emp/menu_items/view_attendance.dart';
+import 'package:gov_qr_emp/menu_items/employee_form.dart';
+import 'package:gov_qr_emp/qr_scanner/qr_scanner.dart';
+import 'package:gov_qr_emp/login_module/login_page.dart';
+import 'package:gov_qr_emp/utilities/show_message_alert.dart';
+import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'menu_items/employee_form.dart';
-import 'qr_scanner/qr_scanner.dart';
-import 'menu_items/view_all_employees.dart';
-import 'menu_items/view_attendance.dart';
-import 'login_module/login_page.dart';
+
+import 'utilities/access_permissions_enum.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +44,7 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
   QRViewController? _qrViewController;
   User? _user;
+  List<AccessPermission> _userPermissions = [];
 
   @override
   void initState() {
@@ -46,8 +52,47 @@ class MainPageState extends State<MainPage> {
     FirebaseAuth.instance.authStateChanges().listen((user) {
       setState(() {
         _user = user;
+        if (_user != null) {
+          _fetchUserPermissions();
+        } else {
+          _userPermissions = [];
+        }
       });
     });
+  }
+
+  Future<void> _fetchUserPermissions() async {
+    if (_user == null) return;
+    if (_user!.email == 'test_admin@gmail.com') {
+      setState(() {
+        _userPermissions = AccessPermission.values;
+      });
+      return;
+    }
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('AccessUsers')
+          .where('emails', arrayContains: _user!.email)
+          .limit(1)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        final data = userDoc.docs.first.data();
+        final permissions = List<String>.from(data['permissions'] ?? []);
+        setState(() {
+          _userPermissions = permissions
+              .map((name) => AccessPermissionExtension.fromName(name))
+              .whereType<AccessPermission>()
+              .toList();
+        });
+      } else {
+        setState(() {
+          _userPermissions = [];
+        });
+      }
+    } catch (e) {
+      showMessageAlert(context, 'Failed to fetch user permissions');
+    }
   }
 
   @override
@@ -89,45 +134,49 @@ class MainPageState extends State<MainPage> {
               ),
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.list),
-            title: const Text('Attendance'),
-            onTap: () {
-              _pauseQRScanner();
-              navigateToAttendance();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.lock),
-            title: const Text('Manage Access'),
-            onTap: () {
-              _pauseQRScanner();
-              navigateToManageAccess();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.people),
-            title: const Text('All Employees'),
-            onTap: () {
-              _pauseQRScanner();
-              navigateToViewAllEmployees();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.add),
-            title: const Text('New Employee'),
-            onTap: () {
-              _pauseQRScanner();
-              navigateToEmployeeForm();
-            },
-          ),
+          if (_userPermissions.contains(AccessPermission.viewAttendance))
+            ListTile(
+              leading: const Icon(Icons.list),
+              title: const Text('Attendance'),
+              onTap: () {
+                _pauseQRScanner();
+                navigateToAttendance();
+              },
+            ),
+            if (_userPermissions.contains(AccessPermission.manageAccess))
+            ListTile(
+              leading: const Icon(Icons.lock),
+              title: const Text('Manage Access'),
+              onTap: () {
+                _pauseQRScanner();
+                navigateToManageAccess();
+              },
+            ),
+          if (_userPermissions.contains(AccessPermission.viewAllEmployees))
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('All Employees'),
+              onTap: () {
+                _pauseQRScanner();
+                navigateToViewAllEmployees();
+              },
+            ),
+          if (_userPermissions.contains(AccessPermission.addNewEmployees))
+            ListTile(
+              leading: const Icon(Icons.add),
+              title: const Text('New Employee'),
+              onTap: () {
+                _pauseQRScanner();
+                navigateToEmployeeForm();
+              },
+            ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Logout'),
             onTap: () async {
               await _logout();
-              showSnackBar('Logged out successfully');
+              showSnackbar(context, 'Logged out successfully');
               Navigator.pop(context);
             },
           ),
@@ -157,13 +206,6 @@ class MainPageState extends State<MainPage> {
     });
   }
 
-  void showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      duration: const Duration(seconds: 2),
-    ));
-  }
-
   void navigateToLoginPage() {
     Navigator.push(
       context,
@@ -172,6 +214,7 @@ class MainPageState extends State<MainPage> {
       setState(() {
         _user = FirebaseAuth.instance.currentUser;
       });
+      _fetchUserPermissions();
       _resumeQRScanner();
     });
   }

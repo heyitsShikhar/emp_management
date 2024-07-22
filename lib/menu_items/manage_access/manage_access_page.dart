@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gov_qr_emp/utilities/constants.dart';
+import 'package:gov_qr_emp/utilities/access_permissions_enum.dart';
 import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'update_users_dialog.dart';
 import 'update_access_dialog.dart';
@@ -19,7 +19,7 @@ class ManageAccessPageState extends State<ManageAccessPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final TextEditingController _accessTypeController = TextEditingController();
-  List<String> _selectedPermissions = [];
+  List<AccessPermission> _selectedPermissions = [];
 
   @override
   void initState() {
@@ -46,8 +46,8 @@ class ManageAccessPageState extends State<ManageAccessPage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  showUpdateAccessDialog(
-                      context, documentId, data, accessPermissions, _firestore);
+                  showUpdateAccessDialog(context, documentId, data,
+                      AccessPermission.values, _firestore);
                 },
                 child: const Text('Update Access'),
               ),
@@ -100,7 +100,8 @@ class ManageAccessPageState extends State<ManageAccessPage> {
             itemBuilder: (context, index) {
               final data = accessUsers[index].data() as Map<String, dynamic>;
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: ListTile(
                   title: Text(data['accessType']),
                   subtitle: Text(
@@ -109,7 +110,8 @@ class ManageAccessPageState extends State<ManageAccessPage> {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () => _showEditDialog(accessUsers[index].id, data),
+                    onPressed: () =>
+                        _showEditDialog(accessUsers[index].id, data),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

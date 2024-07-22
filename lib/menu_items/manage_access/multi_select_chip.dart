@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 
-class MultiSelectChip extends StatefulWidget {
-  final List<String> items;
-  final List<String> initialSelectedItems;
-  final Function(List<String>) onSelectionChanged;
+class MultiSelectChip<T> extends StatefulWidget {
+  final List<T> items;
+  final List<T> initialSelectedItems;
+  final String Function(T) itemLabelBuilder;
+  final void Function(List<T>) onSelectionChanged;
 
   const MultiSelectChip({
-    Key? key,
+    super.key,
     required this.items,
-    required this.onSelectionChanged,
+    required this.itemLabelBuilder,
     this.initialSelectedItems = const [],
-  }) : super(key: key);
+    required this.onSelectionChanged,
+  });
 
   @override
-  MultiSelectChipState createState() => MultiSelectChipState();
+  MultiSelectChipState<T> createState() => MultiSelectChipState<T>();
 }
 
-class MultiSelectChipState extends State<MultiSelectChip> {
-  List<String> selectedItems = [];
+class MultiSelectChipState<T> extends State<MultiSelectChip<T>> {
+  late List<T> _selectedItems;
 
   @override
   void initState() {
     super.initState();
-    selectedItems = List.from(widget.initialSelectedItems);
+    _selectedItems = widget.initialSelectedItems;
   }
 
   @override
@@ -30,17 +32,18 @@ class MultiSelectChipState extends State<MultiSelectChip> {
     return Wrap(
       spacing: 8.0,
       children: widget.items.map((item) {
-        return FilterChip(
-          label: Text(item),
-          selected: selectedItems.contains(item),
+        final isSelected = _selectedItems.contains(item);
+        return ChoiceChip(
+          label: Text(widget.itemLabelBuilder(item)),
+          selected: isSelected,
           onSelected: (selected) {
             setState(() {
               if (selected) {
-                selectedItems.add(item);
+                _selectedItems.add(item);
               } else {
-                selectedItems.remove(item);
+                _selectedItems.remove(item);
               }
-              widget.onSelectionChanged(selectedItems);
+              widget.onSelectionChanged(_selectedItems);
             });
           },
         );

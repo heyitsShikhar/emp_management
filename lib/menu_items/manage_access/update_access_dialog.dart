@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gov_qr_emp/utilities/access_permissions_enum.dart';
 import 'package:gov_qr_emp/utilities/show_message_alert.dart';
 import 'package:gov_qr_emp/utilities/show_snackbar.dart';
 import 'multi_select_chip.dart';
@@ -8,12 +9,15 @@ void showUpdateAccessDialog(
   BuildContext context,
   String documentId,
   Map<String, dynamic> data,
-  List<String> permissions,
+  List<AccessPermission> permissions,
   FirebaseFirestore firestore,
 ) {
   final List<String> initialPermissions =
       List<String>.from(data['permissions'] ?? []);
-  final List<String> selectedPermissions = [];
+  final List<AccessPermission> selectedPermissions = initialPermissions
+      .map((name) => AccessPermissionExtension.fromName(name))
+      .whereType<AccessPermission>()
+      .toList();
 
   showDialog(
     context: context,
@@ -24,9 +28,10 @@ void showUpdateAccessDialog(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MultiSelectChip(
+            MultiSelectChip<AccessPermission>(
               items: permissions,
-              initialSelectedItems: initialPermissions,
+              itemLabelBuilder: (permission) => permission.name,
+              initialSelectedItems: selectedPermissions,
               onSelectionChanged: (selectedList) {
                 selectedPermissions.clear();
                 selectedPermissions.addAll(selectedList);
@@ -45,7 +50,9 @@ void showUpdateAccessDialog(
                     firestore
                         .collection('AccessUsers')
                         .doc(documentId)
-                        .update({'permissions': selectedPermissions});
+                        .update({
+                      'permissions': selectedPermissions.map((e) => e.name).toList()
+                    });
                     Navigator.pop(context);
                     showSnackbar(context, 'Permissions updated successfully');
                   } else {

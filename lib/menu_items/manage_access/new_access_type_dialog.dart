@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gov_qr_emp/utilities/constants.dart';
+import 'package:gov_qr_emp/utilities/access_permissions_enum.dart';
 import 'package:gov_qr_emp/utilities/show_message_alert.dart';
 import 'multi_select_chip.dart';
 
@@ -8,7 +8,7 @@ void showAddAccessDialog(
   BuildContext context,
   FirebaseFirestore firestore,
   TextEditingController accessTypeController,
-  List<String> selectedPermissions,
+  List<AccessPermission> selectedPermissions,
   Function() onAccessAdded,
 ) {
   showDialog(
@@ -31,8 +31,9 @@ void showAddAccessDialog(
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: MultiSelectChip(
-                        items: accessPermissions,
+                      child: MultiSelectChip<AccessPermission>(
+                        items: AccessPermission.values,
+                        itemLabelBuilder: (permission) => permission.name,
                         onSelectionChanged: (selectedList) {
                           selectedPermissions.clear();
                           selectedPermissions.addAll(selectedList);
@@ -52,7 +53,7 @@ void showAddAccessDialog(
                   if (accessType.isNotEmpty && selectedPermissions.isNotEmpty) {
                     final newAccess = {
                       'accessType': accessType,
-                      'permissions': selectedPermissions,
+                      'permissions': selectedPermissions.map((e) => e.name).toList(),
                     };
                     await firestore.collection('AccessUsers').add(newAccess);
                     onAccessAdded();

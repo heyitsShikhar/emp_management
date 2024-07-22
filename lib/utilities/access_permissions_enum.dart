@@ -3,7 +3,6 @@ enum AccessPermission {
   viewAttendance,
   addNewEmployees,
   checkInCheckOut,
-  manageAccess,
 }
 
 extension AccessPermissionExtension on AccessPermission {
@@ -17,8 +16,6 @@ extension AccessPermissionExtension on AccessPermission {
         return 'Add new employees';
       case AccessPermission.checkInCheckOut:
         return 'Check-in/Check-out';
-      case AccessPermission.manageAccess:
-        return 'Manage Access';
     }
   }
   
@@ -32,8 +29,6 @@ extension AccessPermissionExtension on AccessPermission {
         return AccessPermission.addNewEmployees;
       case 'Check-in/Check-out':
         return AccessPermission.checkInCheckOut;
-      case 'Manage Access':
-        return AccessPermission.manageAccess;
       default:
         return null;
     }

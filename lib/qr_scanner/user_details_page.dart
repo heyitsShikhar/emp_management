@@ -5,7 +5,9 @@ import '../shared/employee.dart';
 
 class UserDetailsPage extends StatefulWidget {
   final Employee employee;
-  const UserDetailsPage({super.key, required this.employee});
+  final bool checkInOutAccess;
+  const UserDetailsPage(
+      {super.key, required this.employee, required this.checkInOutAccess});
 
   @override
   UserDetailsPageState createState() => UserDetailsPageState();
@@ -13,13 +15,11 @@ class UserDetailsPage extends StatefulWidget {
 
 class UserDetailsPageState extends State<UserDetailsPage> {
   late Future<Map<String, dynamic>?> _attendanceFuture;
-  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _attendanceFuture = _fetchAttendance();
-    _currentUser = FirebaseAuth.instance.currentUser;
   }
 
   Future<Map<String, dynamic>?> _fetchAttendance() async {
@@ -79,7 +79,7 @@ class UserDetailsPageState extends State<UserDetailsPage> {
                 Text('Phone Number: ${widget.employee.phoneNumber}',
                     style: const TextStyle(fontSize: 18)),
                 const SizedBox(height: 20),
-                if (_currentUser != null)
+                if (widget.checkInOutAccess)
                   attendance == null || attendance['checkOut'] != null
                       ? ElevatedButton(
                           onPressed: () => _checkIn(context),

@@ -45,6 +45,7 @@ class MainPageState extends State<MainPage> {
   QRViewController? _qrViewController;
   User? _user;
   List<AccessPermission> _userPermissions = [];
+  bool isAdminUser = false;
 
   @override
   void initState() {
@@ -62,10 +63,12 @@ class MainPageState extends State<MainPage> {
   }
 
   Future<void> _fetchUserPermissions() async {
+    isAdminUser = false;
     if (_user == null) return;
     if (_user!.email == 'test_admin@gmail.com') {
       setState(() {
         _userPermissions = AccessPermission.values;
+        isAdminUser = true;
       });
       return;
     }
@@ -112,7 +115,11 @@ class MainPageState extends State<MainPage> {
               ]
             : null,
       ),
-      body: QRScanner(onQRViewCreated: _setQRViewController),
+      body: QRScanner(
+        onQRViewCreated: _setQRViewController,
+        checkInOutAccess:
+            _userPermissions.contains(AccessPermission.checkInCheckOut),
+      ),
       drawer: _user != null ? _buildDrawer(context) : null,
     );
   }
@@ -143,7 +150,7 @@ class MainPageState extends State<MainPage> {
                 navigateToAttendance();
               },
             ),
-            if (_userPermissions.contains(AccessPermission.manageAccess))
+          if (isAdminUser)
             ListTile(
               leading: const Icon(Icons.lock),
               title: const Text('Manage Access'),

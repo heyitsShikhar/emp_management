@@ -7,9 +7,13 @@ import 'user_details_page.dart';
 import '../shared/employee.dart';
 
 class QRScanner extends StatefulWidget {
+  final bool checkInOutAccess;
   final Function(QRViewController) onQRViewCreated;
 
-  const QRScanner({super.key, required this.onQRViewCreated});
+  const QRScanner(
+      {super.key,
+      required this.onQRViewCreated,
+      required this.checkInOutAccess});
 
   @override
   State<StatefulWidget> createState() => _QRScannerState();
@@ -79,7 +83,10 @@ class _QRScannerState extends State<QRScanner> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UserDetailsPage(employee: employee),
+        builder: (context) => UserDetailsPage(
+          employee: employee,
+          checkInOutAccess: widget.checkInOutAccess,
+        ),
       ),
     ).then((_) {
       setState(() {

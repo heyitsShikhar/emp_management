@@ -29,37 +29,30 @@ void showUpdateUsersDialog(BuildContext context, String documentId,
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final email = emailController.text;
                 final password = passwordController.text;
                 if (email.isNotEmpty && password.isNotEmpty) {
                   final currentUser = auth.currentUser;
                   final currentEmail = currentUser?.email;
-                  if (currentEmail != null) {
-                    showAdminPasswordDialog(context, (adminPassword) async {
-                      try {
-                        await auth.createUserWithEmailAndPassword(
-                          email: email,
-                          password: password,
-                        );
-                        emails.add(email);
-                        await firestore
-                            .collection('AccessUsers')
-                            .doc(documentId)
-                            .update({'emails': emails});
-                        await auth.signInWithEmailAndPassword(
-                          email: currentEmail,
-                          password: adminPassword,
-                        );
-                        Navigator.pop(context);
-                        showSnackbar(context, 'User added successfully');
-                      } catch (e) {
-                        showMessageAlert(context, 'Failed to add user');
-                      }
-                    });
-                  } else {
-                    showMessageAlert(
-                        context, 'Current user is not authenticated');
+                  try {
+                    await auth.createUserWithEmailAndPassword(
+                      email: email,
+                      password: password,
+                    );
+                    emails.add(email);
+                    await firestore
+                        .collection('AccessUsers')
+                        .doc(documentId)
+                        .update({'emails': emails});
+                    await auth.signInWithEmailAndPassword(
+                      email: currentEmail ?? '',
+                      password: 'test@123',
+                    );
+                    Navigator.pop(context);
+                    showSnackbar(context, 'User added successfully');
+                  } catch (e) {
+                    showMessageAlert(context, 'Failed to add user');
                   }
                 } else {
                   showMessageAlert(context, 'Please enter email and password');

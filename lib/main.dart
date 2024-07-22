@@ -133,12 +133,25 @@ class MainPageState extends State<MainPage> {
             decoration: BoxDecoration(
               color: Colors.blue.shade400,
             ),
-            child: const Text(
-              'Power Grid',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Power Grid',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+                Text(
+                  _user?.email ?? "",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
           ),
           if (_userPermissions.contains(AccessPermission.viewAttendance))

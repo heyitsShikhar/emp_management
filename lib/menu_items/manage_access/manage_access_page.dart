@@ -104,9 +104,18 @@ class ManageAccessPageState extends State<ManageAccessPage> {
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: ListTile(
                   title: Text(data['accessType']),
-                  subtitle: Text(
-                    'Emails: ${data['emails']?.join(', ') ?? '-----'}\n'
-                    'Permissions: ${data['permissions']?.join(', ') ?? '-----'}',
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          style:
+                              const TextStyle(overflow: TextOverflow.ellipsis),
+                          'Emails: ${data['emails']?.join(', ') ?? '-----'}'),
+                      Text(
+                        style: const TextStyle(overflow: TextOverflow.ellipsis),
+                        'Permissions: ${data['permissions']?.join(', ') ?? '-----'}',
+                      ),
+                    ],
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),

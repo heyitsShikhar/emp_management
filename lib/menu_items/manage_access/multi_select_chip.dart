@@ -24,7 +24,7 @@ class MultiSelectChipState<T> extends State<MultiSelectChip<T>> {
   @override
   void initState() {
     super.initState();
-    _selectedItems = widget.initialSelectedItems;
+    _selectedItems = List<T>.from(widget.initialSelectedItems);
   }
 
   @override

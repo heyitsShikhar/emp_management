@@ -99,7 +99,7 @@ class MainPageState extends State<MainPage> {
           ),
           ListTile(
             leading: const Icon(Icons.lock),
-            title: const Text('Manage user access'),
+            title: const Text('Manage Access'),
             onTap: () {
               _pauseQRScanner();
               navigateToManageAccess();
@@ -107,7 +107,7 @@ class MainPageState extends State<MainPage> {
           ),
           ListTile(
             leading: const Icon(Icons.people),
-            title: const Text('All employees'),
+            title: const Text('All Employees'),
             onTap: () {
               _pauseQRScanner();
               navigateToViewAllEmployees();

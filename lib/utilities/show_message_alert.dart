@@ -5,7 +5,7 @@ Future<dynamic> showMessageAlert(BuildContext context, String message) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Error'),
+        title: const Text('Oops!'),
         content: Text(message),
         actions: [
           TextButton(

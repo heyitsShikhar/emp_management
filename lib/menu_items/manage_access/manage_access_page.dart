@@ -99,15 +99,22 @@ class ManageAccessPageState extends State<ManageAccessPage> {
             itemCount: accessUsers.length,
             itemBuilder: (context, index) {
               final data = accessUsers[index].data() as Map<String, dynamic>;
-              return ListTile(
-                title: Text(data['accessType']),
-                subtitle: Text(
-                  'Emails: ${data['emails']?.join(', ') ?? '-----'}\n'
-                  'Permissions: ${data['permissions']?.join(', ') ?? '-----'}',
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditDialog(accessUsers[index].id, data),
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: ListTile(
+                  title: Text(data['accessType']),
+                  subtitle: Text(
+                    'Emails: ${data['emails']?.join(', ') ?? '-----'}\n'
+                    'Permissions: ${data['permissions']?.join(', ') ?? '-----'}',
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () => _showEditDialog(accessUsers[index].id, data),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
                 ),
               );
             },
